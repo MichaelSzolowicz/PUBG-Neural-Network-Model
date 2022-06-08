@@ -6,8 +6,13 @@ coordinates = []
 
 
 # Port used in training: udp port 4380 or udp portrange 27000-27040
-# Full PUBG ports: tcp portrange 27015-27030 or tcp portrange 27037 or udp port 4380 or udp portrange 27000-27031 or
-# udp port 27036
+# Full PUBG ports: tcp portrange 27015-27030 or tcp portrange 27037 or udp port 4380 or udp portrange 27000-27031
+# or udp port 27036
+
+# Port ranges that produce output as of June 2022. Note that output is erratic.
+# udp portrange 6999-8000
+# udp portrange 6999-8000 or tcp portrange 27000-27040
+# udp portrange 7000-7999
 def main():
     global coordinates
     print('Packet Sniffer Sniffs')
@@ -20,8 +25,8 @@ def main():
 
 def get_predictions(m):
     local_ip = scapy.get_if_addr(scapy.conf.iface)
-    packet = scapy.sniff(count=1, filter="udp port 4380 or udp portrange 27000-27040")
-    # packet.hexdump()
+    packet = scapy.sniff(count=1, filter="udp portrange 7000-7999")
+    packet.hexdump()
 
     if packet[0].payload.src != local_ip:
         print("You received a packet!")
