@@ -10,28 +10,28 @@ import csv
 
 # Main function
 def main():
-    api_key = ""
+    api_key = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI1NWQ4NWU1MC1jODE3LTAxM2EtYzc4Yi03OWE4NjMxM2U1MTMiLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNjU0NTU1MTE5LCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6InB1YmctZGF0YS1wcm9jIn0.K4JaJpbDJpnkt2zPfbt9L3OASg94B7bCgGrliksa_tI"
     pubg = PUBG(api_key, "pc-na")
 
     # This block of code gets players as well as current season, used to get match id of latest game played by player
 
-    players = pubg.players_from_names(["Oogie_"])
-    Oogie_ = players[0]
+    players = pubg.players_from_names(["Mszolo"])
+    Mszolo = players[0]
     current_season = pubg.current_season()
-    # match_id = pubg_info.get_season_duo_match_ids(Oogie_, current_season)
+    # match_id = pubg_info.get_season_duo_match_ids(Mszolo, current_season)
 
     # This line of code is used if you have the match id of a certain match.
-    match_id = pubg.match('d5957ce8-ae38-4460-9ad5-048663424955')
+    match_id = pubg.match('8e29284b-e847-4ca7-a095-b5cee1ff89fd')
 
     # This block of code creates a csv file for player positions given the match_id. User must manually enter file
     # location for csv in second parameter.
     telemetry = match_id.get_telemetry()
-    pubg_csv.player_position_csv(telemetry, 'PlayerPositions/player_pos_7_22_1518.csv')
-    pubg_csv.fill_csv('PlayerPositions/player_pos_7_22_1518.csv')
+    pubg_csv.player_position_csv(telemetry, 'PlayerPositions/player_pos_6_9_22_0923.csv')
+    pubg_csv.fill_csv('PlayerPositions/player_pos_6_9_22_0923.csv')
 
     # This line of code creates tensors for player positions: x for byte data and y for player positions. It also
     # returns a list of timestamps that match the packet received and player positions at that timestamp
-    x, y, timestamps = pubg_tensors.get_tensors('PlayerPositions/player_pos_7_22_1134.csv', 'NetworkPackets/packets_7_22_1134.json')
+    x, y, timestamps = pubg_tensors.get_tensors('PlayerPositions/player_pos_6_9_22_0923.csv', 'NetworkPackets/packets_6_9_22_0923.json')
 
     # This block of code either prepares the data for training the model or for evaluating the predicted coordinates
     # User most comment one out for whatever they are trying to do.
