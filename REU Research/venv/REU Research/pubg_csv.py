@@ -1,12 +1,46 @@
 import csv
 import datetime
 import pytz
+import os
+
+
+# Creates or updates a record of predicted positions.
+def record_prediction_csv(file_name, timestamp, predictions):
+    # Create a csv file and fill with generic headers if csv file path does not yet exist.
+    header = ['timestamp']
+    count = 0
+    if not os.path.exists(file_name):
+        while count < 100:
+            header.append('Player{0}_x'.format(count))
+            header.append('Player{0}_y'.format(count))
+            count += 1
+        write_file = open(file_name, 'w', newline='')
+        csv_writer = csv.DictWriter(write_file, fieldnames=header, restval="")
+        csv_writer.writeheader()
+        write_file.close()
+    # Else append a new timestamp and associated predictions to existing csv file.
+    else:
+        new_file = open(file_name, 'a', newline='')
+        csv_writer = csv.writer(new_file)
+        print('TIMESTAMP', timestamp)
+        timestamps = [timestamp.astimezone(pytz.timezone('US/Pacific'))]
+        for prediction in predictions:
+            timestamps.append(prediction[0])
+            timestamps.append(prediction[1])
+        csv_writer.writerow(timestamps)
 
 
 # Creates a csv file of player positions given telemetry object
 def player_position_csv(telemetry, csv_file_name):
     csv_header = ['timestamp']
 
+    """
+    From the chicken_dinner source for filter_by("log_player_positions"):
+        Returns a dict of players positions up to death with keys being player
+        names and values being a list of tuples. Each tuple has four elements
+        being (t, x, y, z) coordinates where t is taken from the event
+        timestamps.
+    """
     player_positions = telemetry.filter_by("log_player_position")
     characters = []
     timestamps = []
@@ -43,6 +77,7 @@ def player_position_csv(telemetry, csv_file_name):
     csv_reader = csv.reader(open(csv_file_name))
     csv_list = list(csv_reader)
 
+    # Moves character positions from player_positions dictionary to csv_list in order to prepare for writing.
     for timestamp in timestamps_GMT:
         for players in player_positions:
             if players.timestamp == timestamp:
