@@ -4,61 +4,10 @@ import collections
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import scipy.stats as st
+import pubg_normalization as pubg_norm
 
-
-def normalize(values, mini=None, maxi=None):
-    if mini is None:
-        mini = min(values)
-    if maxi is None:
-        maxi = max(values)
-
-    for i, value in enumerate(values):
-        values[i] = ((value - mini) / (maxi - mini))
-
-    return values
-
-
-def mirror_axis(values):
-    for i in range(len(values)):
-        values[i] = abs(values[i] - 1)
-
-
-def sum_pos_neg(prediction_grid):
-    sum_neg = 0
-    sum_pos = 0
-    for i in prediction_grid:
-        for j in i:
-            if j < 0:
-                sum_neg += j
-            else:
-                sum_pos += j
-    return sum_neg, sum_pos
-
-
-def map_limits(map_name):
-    """
-    Map Limits
-    Each map has a unique upper limit for recorded coordinates. Note that not every map's bounds are listed
-    in the PUBG API documentation, in these cases a default value of 800000 is returned.
-
-    Returns:
-        (int): upper limit
-    """
-
-    match map_name:
-        case 'erangel':
-            return 816000
-        case 'miramar':
-            return 816000
-        case 'vikendi':
-            return 612000
-        case 'sanhok':
-            return 408000
-        case 'karakin':
-            return 204000
-        case _:
-            return 800000
-
+fully_overpredicted = 4400
+graphs_path = 'Graphs/heatmap_{}'
 
 def extract_coords(file_path, axis, range_min=None, range_max=None, start_time=None, stop_time=None):
     """
@@ -196,19 +145,9 @@ def plot_heatmap(z_values, scale=1, timestamp=00, overpred_factor=None, map=None
     return fig, ax
 
 
-def user_interface():
-    recording_csv = 'PlayerPositions\player_pos_6_28_22_1337.csv'
-    prediction_csv = 'Predictions\predictions_6_28_22_1337.csv'
-    start_time = '2022-06-28 13:44:44'
-    stop_time = '2022-06-28 13:54:40'
-    map_path = 'Assets\sanhok-map.jpg'
-    bandwidth = .2
-    scale = 3
-    # graph_path = 'Graphs/{}.jpg'
-    draw_fig = False
-
+def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_path, bandwidth=.2, scale=3, draw_fig=False):
     map = mpimg.imread(map_path)
-    limit = map_limits(map_path[7:-8])
+    limit = pubg_norm.map_limits(map_path[7:-8])
 
     prd_x = extract_coords(prediction_csv, 'x', start_time=start_time, stop_time=stop_time)
     prd_y = extract_coords(prediction_csv, 'y', start_time=start_time, stop_time=stop_time)
@@ -218,6 +157,9 @@ def user_interface():
     print(rec_x)
     print(rec_x)
 
+    count = 0
+    sum_overpred_factor = 0
+
     inp = input('Save figure? y / n / YES_all / NO_all: ')
 
     # Graph each set of coordinates from extractions
@@ -226,10 +168,10 @@ def user_interface():
         if key in rec_y:
             if key in prd_x:
                 if key in prd_y:
-                    rec_x[key] = normalize(rec_x[key], 0, limit)    # Prep data / normalize actual coords to map limits
-                    rec_y[key] = normalize(rec_y[key], 0, limit)
-                    mirror_axis(rec_y[key])     # Prep data / recordings' origin at top left; flip before graphing
-                    mirror_axis(prd_y[key])
+                    rec_x[key] = pubg_norm.normalize(rec_x[key], 0, limit)    # Prep data / normalize actual coords to map limits
+                    rec_y[key] = pubg_norm.normalize(rec_y[key], 0, limit)
+                    pubg_norm.mirror_axis(rec_y[key])     # Prep data / recordings' origin at top left; flip before graphing
+                    pubg_norm.mirror_axis(prd_y[key])
                     prd_x[key] = [i * scale for i in prd_x[key]]    # Prep data / scaling help make KDE clearer
                     prd_y[key] = [i * scale for i in prd_y[key]]
                     rec_x[key] = [i * scale for i in rec_x[key]]
@@ -241,8 +183,10 @@ def user_interface():
                     prd_kernel, prd_xx, prd_yy, prd_z = perform_kde(prd_x[key], prd_y[key], .2, scale, 200j)
                     rec_kernel, rec_xx, rec_yy, rec_z = perform_kde(rec_x[key], rec_y[key], .2, scale, 200j)
 
-                    sum_neg, sum_pos = sum_pos_neg(prd_z - rec_z)
-                    overpred_factor = normalize([sum_pos], mini=0, maxi=4400)
+                    sum_neg, sum_pos = pubg_norm.sum_pos_neg(prd_z - rec_z)
+                    overpred_factor = pubg_norm.normalize([sum_pos], mini=0, maxi=fully_overpredicted)
+                    sum_overpred_factor += overpred_factor[0]
+                    count += 1
                     # print('Overprediction factor: ', overpred_factor)
 
                     fig, ax = plot_heatmap((prd_z - rec_z), scale, map=map, timestamp=key, overpred_factor=overpred_factor, x=x_coords, y=y_coords, colors=['red', 'blue'])
@@ -250,12 +194,12 @@ def user_interface():
                     file_timestamp = key.translate({ord(c): None for c in '- :'})   # Reformat timestamp for filename
                     match inp:
                         case 'y':
-                            plt.savefig('Graphs/heatmap_{}'.format(file_timestamp), dpi=200)
+                            plt.savefig(graphs_path.format(file_timestamp), dpi=200)
                             if draw_fig:
                                 plt.show()
                             inp = input('Save figure? y / n / YES_all / NO_all: ')
                         case 'YES_all':
-                            plt.savefig('Graphs/heatmap_{}'.format(file_timestamp), dpi=200)
+                            plt.savefig(graphs_path.format(file_timestamp), dpi=200)
                             if draw_fig:
                                 plt.show()
                         case 'n':
@@ -267,6 +211,21 @@ def user_interface():
                                 plt.show()
                             pass
                     plt.close()
+    return sum_overpred_factor, count
 
 
-user_interface()
+recording_csv = ['PlayerPositions\player_pos_6_28_22_1337.csv', 'PlayerPositions\player_pos_6_28_22_1358.csv']
+prediction_csv = ['Predictions\predictions_6_28_22_1337.csv', 'Predictions\predictions_6_28_22_1358.csv']
+start_time = ['2022-06-28 13:44:44', '2022-06-28 14:04:22']
+stop_time  = ['2022-06-28 13:44:51', '2022-06-28 14:04:28']
+map_path = ['Assets\sanhok-map.jpg', 'Assets\\taego-map.jpg']
+
+sum_overpred_factor = 0
+count = 0
+
+for i, file in enumerate(recording_csv):
+    overpred_factor, loops = user_interface(recording_csv[i], prediction_csv[i], start_time[i], stop_time[i], map_path[i])
+    sum_overpred_factor += overpred_factor
+    count += loops
+
+print(sum_overpred_factor / count)
