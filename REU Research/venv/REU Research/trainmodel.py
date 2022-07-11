@@ -13,13 +13,13 @@ def train(m, x, y):
 	ls = []
 	y = y.nan_to_num()
 	y = y / y.max()
-	for i in range(100):
+	for i in range(100):	# Why is this loop here?
 		y_pred = m(x)
 		loss = loss_fn(y_pred, y)
 		opt.zero_grad()
 		loss.backward()
 		opt.step()
-		# print(loss)
+		print(loss)
 		ls.append(loss)
 
 
@@ -111,25 +111,25 @@ def plot(m, val_x, val_y):
 def main():
 	m = model.load()
 
-	# train_x = torch.load('train_x.pt')
-	# train_y = torch.load('train_y.pt')
-	# train(m, train_x, train_y)
+	train_x = torch.load('train_x.pt')
+	train_y = torch.load('train_y.pt')
+	train(m, train_x, train_y)
 
-	val_x = torch.load('val_x.pt')
-	val_y = torch.load('val_y.pt')
-	loss = evaluation(m, val_x, val_y)
+	# val_x = torch.load('val_x.pt')
+	# val_y = torch.load('val_y.pt')
+	# loss = evaluation(m, val_x, val_y)
 
-	print('Evaluation: {0}'.format(loss))
+	# print('Evaluation: {0}'.format(loss))
 
-	plot(m, val_x, val_y)
+	# plot(m, val_x, val_y)
 
-	# val = input('Save Model? (Y/N): ')
-	# val = val.upper()
-	# if val == 'Y':
-	# 	model.save(m)
-	# 	print('Model saved!')
-	# else:
-	# 	print('Model not saved.')
+	val = input('Save Model? (Y/N): ')
+	val = val.upper()
+	if val == 'Y':
+		model.save(m)
+		print('Model saved!')
+	else:
+		print('Model not saved.')
 
 
 if __name__ == "__main__":
