@@ -5,9 +5,24 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import scipy.stats as st
 import pubg_normalization as pubg_norm
+import datetime
 
 fully_overpredicted = 4400
-graphs_path = 'Graphs/heatmap_{}'
+graphs_path = 'Graphs/heatmap_{}.jpg'
+
+
+def string_to_datetime(timestamp):
+    year = int(timestamp[:4])
+    month = int(timestamp[5:7])
+    day = int(timestamp[8:10])
+    hr = int(timestamp[11:13])
+    mins = int(timestamp[14:16])
+    sec = int(timestamp[17:19])
+    mill = int(timestamp[20:26])
+
+    datetimestamp = datetime.time(hr, mins, sec, mill)
+    return datetime.datetime.combine(datetime.date(1, 1, 1), datetimestamp)
+
 
 def extract_coords(file_path, axis, range_min=None, range_max=None, start_time=None, stop_time=None):
     """
@@ -27,22 +42,20 @@ def extract_coords(file_path, axis, range_min=None, range_max=None, start_time=N
     """
     columns = []
     coords = {}
-    start_time_digits = 26      # By default, get timestamps to a specificity of seconds.
-    stop_time_digits = 26
+    start_time_digits = 19      # By default, get timestamps to a specificity of seconds.
+    stop_time_digits = 19
 
     csv_file = open(file_path, 'r')
     csv_reader = csv.reader(csv_file, delimiter=',')
 
     # Get a list of the column #'s containing the axis of interest.
     for i in csv_reader:
-        for column, j in enumerate(i):
+        for num, j in enumerate(i):
             if j[-1] == axis:
-                columns.append(column)
+                columns.append(num)
         break
 
     # Get indices of start and stop timestamps.
-    # Note that if there are multiple of the same timestamp, the last initial matching timestamp and
-    # the first matching stop timestamp are indexed.
     if start_time is not None and stop_time is not None:
         temp_file = open(file_path, 'r')
         temp_reader = csv.reader(temp_file, delimiter=',')
@@ -51,9 +64,9 @@ def extract_coords(file_path, axis, range_min=None, range_max=None, start_time=N
         stop_time_digits = len(stop_time)
 
         for i, row in enumerate(temp_reader):
-            if str(row[0])[:start_time_digits] == start_time:
+            if row[0][:start_time_digits] == start_time:
                 range_min = i + 1
-            if str(row[0])[:stop_time_digits] == stop_time:
+            if row[0][:stop_time_digits] == stop_time:
                 range_max = i + 1
                 break
 
@@ -61,18 +74,18 @@ def extract_coords(file_path, axis, range_min=None, range_max=None, start_time=N
     # Fill any missing coordinates with zero.
     for count, row in enumerate(csv_reader):
         if range_min is None or range_max is None:
-            coords[str(row[0])[:start_time_digits]] = []
+            coords[str(row[0])[:-6]] = []
         elif (range_min - 2) <= count < (range_max - 2):
-            coords[str(row[0])[:start_time_digits]] = []
+            coords[str(row[0])[:-6]] = []
         else:
             continue
         for i in range(len(columns)):
             if columns[i] > (len(row) - 1):
-                coords[str(row[0])[:start_time_digits]].append(.00001)
+                coords[str(row[0])[:-6]].append(.00001)
             elif row[columns[i]] == '' or row[columns[i]] is None:
-                coords[str(row[0])[:start_time_digits]].append(.00001)
+                coords[str(row[0])[:-6]].append(.00001)
             else:
-                coords[str(row[0])[:start_time_digits]].append(float(row[columns[i]]))
+                coords[str(row[0])[:-6]].append(float(row[columns[i]]))
 
     return coords
 
@@ -95,6 +108,7 @@ def perform_kde(coords_x, coords_y, bandwidth=.2, scale=1, res=100j):
         yy: Y values at which KDE was tested.
         z: Output (height) of KDE at tested points.
     """
+
     xx, yy = np.mgrid[0:scale:res, 0:scale:res]
     test_positions = np.vstack([xx.ravel(), yy.ravel()])
     coords = np.vstack([coords_x, coords_y])
@@ -106,7 +120,7 @@ def perform_kde(coords_x, coords_y, bandwidth=.2, scale=1, res=100j):
     return kernel, xx, yy, z
 
 
-def plot_heatmap(z_values, scale=1, timestamp=00, overpred_factor=None, map=None, x=None, y=None, colors=['black']):
+def plot_heatmap(z_values, scale=1, prd_timestamp=00, rec_timestamp=00, overpred_factor=None, map=None, x=None, y=None, colors=['black']):
     """
     Plot Heatmap
 
@@ -125,9 +139,9 @@ def plot_heatmap(z_values, scale=1, timestamp=00, overpred_factor=None, map=None
     """
     fig, ax = plt.subplots()
 
-    plt.title('(Prediction Density) - (Actual Coordinate Density)\n' +
-              'Overprediction Factor: {}\n'.format(overpred_factor) +
-              'Timestamp: {0}'.format(timestamp))
+    plt.title('Prediction Timestamp: {0}\n'.format(prd_timestamp) +
+              'Recording Timestamp: {0}\n'.format(rec_timestamp) +
+              'Overprediction Factor: {0}'.format(overpred_factor), fontsize=10)
     plt.xlabel('X')
     plt.ylabel('Y')
 
@@ -145,87 +159,113 @@ def plot_heatmap(z_values, scale=1, timestamp=00, overpred_factor=None, map=None
     return fig, ax
 
 
-def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_path, bandwidth=.2, scale=3, draw_fig=False):
+def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_path, bandwidth=.2, scale=3, draw_fig=True):
     map = mpimg.imread(map_path)
     limit = pubg_norm.map_limits(map_path[7:-8])
 
-    prd_x = extract_coords(prediction_csv, 'x', start_time=start_time, stop_time=stop_time)
-    prd_y = extract_coords(prediction_csv, 'y', start_time=start_time, stop_time=stop_time)
+    # Later on, KDE functions will take x/y coords as separate lists.
+    prd_x_extraction = extract_coords(prediction_csv, 'x', start_time=start_time, stop_time=stop_time)
+    prd_y_extraction = extract_coords(prediction_csv, 'y', start_time=start_time, stop_time=stop_time)
+    for key in prd_y_extraction:        # Prep prediction data
+        pubg_norm.mirror_axis(prd_y_extraction[key])
+        prd_x_extraction[key] = [i * scale for i in prd_x_extraction[key]]
+        prd_y_extraction[key] = [i * scale for i in prd_y_extraction[key]]
+    rec_x_extraction = extract_coords(recording_csv, 'x', start_time=start_time, stop_time=stop_time)
+    rec_y_extraction = extract_coords(recording_csv, 'y', start_time=start_time, stop_time=stop_time)
+    for key in rec_x_extraction:        # Prep recording data
+        rec_x_extraction[key] = pubg_norm.normalize(rec_x_extraction[key], 0, limit)
+        rec_y_extraction[key] = pubg_norm.normalize(rec_y_extraction[key], 0, limit)
+        pubg_norm.mirror_axis(rec_y_extraction[key])
+        rec_x_extraction[key] = [i * scale for i in rec_x_extraction[key]]
+        rec_y_extraction[key] = [i * scale for i in rec_y_extraction[key]]
 
-    rec_x = extract_coords(recording_csv, 'x', start_time=start_time, stop_time=stop_time)
-    rec_y = extract_coords(recording_csv, 'y', start_time=start_time, stop_time=stop_time)
-    print(rec_x)
-    print(rec_x)
-
-    count = 0
+    # Variables used in loops
     sum_overpred_factor = 0
+    count = 0
+    graph_rec = ''
+    prev_graph_rec = ''
 
     inp = input('Save figure? y / n / YES_all / NO_all: ')
 
-    # Graph each set of coordinates from extractions
-    for count, key in enumerate(rec_x):
-        print(key)
-        if key in rec_y:
-            if key in prd_x:
-                if key in prd_y:
-                    rec_x[key] = pubg_norm.normalize(rec_x[key], 0, limit)    # Prep data / normalize actual coords to map limits
-                    rec_y[key] = pubg_norm.normalize(rec_y[key], 0, limit)
-                    pubg_norm.mirror_axis(rec_y[key])     # Prep data / recordings' origin at top left; flip before graphing
-                    pubg_norm.mirror_axis(prd_y[key])
-                    prd_x[key] = [i * scale for i in prd_x[key]]    # Prep data / scaling help make KDE clearer
-                    prd_y[key] = [i * scale for i in prd_y[key]]
-                    rec_x[key] = [i * scale for i in rec_x[key]]
-                    rec_y[key] = [i * scale for i in rec_y[key]]
+    for graph_prd in prd_x_extraction:
+        smallest_diff = datetime.datetime(9999, 1, 1) - string_to_datetime(graph_prd)
+        smallest_diff = abs(smallest_diff.total_seconds())
 
-                    x_coords = [rec_x[key], prd_x[key]]     # Stack recordings/predictions for simpler data management
-                    y_coords = [rec_y[key], prd_y[key]]
+        # For every key in predictions, find the closest key in recording
+        for key in rec_x_extraction:
+            diff = string_to_datetime(key) - string_to_datetime(graph_prd)
+            diff = abs(diff.total_seconds())
 
-                    prd_kernel, prd_xx, prd_yy, prd_z = perform_kde(prd_x[key], prd_y[key], .2, scale, 200j)
-                    rec_kernel, rec_xx, rec_yy, rec_z = perform_kde(rec_x[key], rec_y[key], .2, scale, 200j)
+            if diff <= smallest_diff:
+                smallest_diff = diff
+                graph_rec = key
 
-                    sum_neg, sum_pos = pubg_norm.sum_pos_neg(prd_z - rec_z)
-                    overpred_factor = pubg_norm.normalize([sum_pos], mini=0, maxi=fully_overpredicted)
-                    sum_overpred_factor += overpred_factor[0]
-                    count += 1
-                    # print('Overprediction factor: ', overpred_factor)
+                # print("Curr Key in prd", graph_prd)
+                # print("Curr key in rec", key)
+                # print("Diff", diff)
+                # print("Smallest Diff", smallest_diff)
+            else:
+                break
 
-                    fig, ax = plot_heatmap((prd_z - rec_z), scale, map=map, timestamp=key, overpred_factor=overpred_factor, x=x_coords, y=y_coords, colors=['red', 'blue'])
+        # Prevents comparison of multiple predictions against same recording,
+        # can be removed if user desires to graph every prediction.
+        if graph_rec == prev_graph_rec:
+            continue
+        prev_graph_rec = graph_rec
 
-                    file_timestamp = key.translate({ord(c): None for c in '- :'})   # Reformat timestamp for filename
-                    match inp:
-                        case 'y':
-                            plt.savefig(graphs_path.format(file_timestamp), dpi=200)
-                            if draw_fig:
-                                plt.show()
-                            inp = input('Save figure? y / n / YES_all / NO_all: ')
-                        case 'YES_all':
-                            plt.savefig(graphs_path.format(file_timestamp), dpi=200)
-                            if draw_fig:
-                                plt.show()
-                        case 'n':
-                            if draw_fig:
-                                plt.show()
-                            inp = input('Save figure? y / n / YES_all / NO_all: ')
-                        case _:
-                            if draw_fig:
-                                plt.show()
-                            pass
-                    plt.close()
+        rec_x = rec_x_extraction[graph_rec]     # KDE Functions take x/y coords as separate lists.
+        rec_y = rec_y_extraction[graph_rec]
+        prd_x = prd_x_extraction[graph_prd]
+        prd_y = prd_y_extraction[graph_prd]
+
+        prd_kernel, prd_xx, prd_yy, prd_z = perform_kde(prd_x, prd_y, .2, scale, 200j)
+        rec_kernel, rec_xx, rec_yy, rec_z = perform_kde(rec_x, rec_y, .2, scale, 200j)
+
+        sum_neg, sum_pos = pubg_norm.sum_pos_neg(prd_z - rec_z)
+        overpred_factor = pubg_norm.normalize([sum_pos], mini=0, maxi=fully_overpredicted)
+        sum_overpred_factor += overpred_factor[0]
+        count += 1
+
+        x_coords = [rec_x, prd_x]  # plot_heatmaps takes lists of coordinates to simplify function signature
+        y_coords = [rec_y, prd_y]
+        fig, ax = plot_heatmap((prd_z - rec_z), scale, map=map, prd_timestamp=graph_prd, rec_timestamp=graph_rec,
+                            overpred_factor=overpred_factor,  x=x_coords, y=y_coords, colors=['red', 'blue'])
+
+        file_timestamp = str(graph_prd).translate({ord(c): '_' for c in '- :.'})  # Reformat timestamp for filename
+        match inp:
+            case 'y':
+                plt.savefig(graphs_path.format(file_timestamp), dpi=200)
+                if draw_fig:
+                    plt.show()
+                inp = input('Save figure? y / n / YES_all / NO_all: ')
+            case 'YES_all':
+                plt.savefig(graphs_path.format(file_timestamp), dpi=200)
+                if draw_fig:
+                    plt.show()
+            case 'n':
+                if draw_fig:
+                    plt.show()
+                inp = input('Save figure? y / n / YES_all / NO_all: ')
+            case _:
+                if draw_fig:
+                    plt.show()
+                pass
+        plt.close()
     return sum_overpred_factor, count
 
 
-recording_csv = ['PlayerPositions\player_pos_6_28_22_1337.csv', 'PlayerPositions\player_pos_6_28_22_1358.csv']
-prediction_csv = ['Predictions\predictions_6_28_22_1337.csv', 'Predictions\predictions_6_28_22_1358.csv']
-start_time = ['2022-06-28 13:44:44', '2022-06-28 14:04:22']
-stop_time  = ['2022-06-28 13:44:51', '2022-06-28 14:04:28']
-map_path = ['Assets\sanhok-map.jpg', 'Assets\\taego-map.jpg']
+recording_csv = ['PlayerPositions\player_pos_6_28_22_1337.csv']
+prediction_csv = ['Predictions\predictions_6_28_22_1337.csv']
+start_time = ['2022-06-28 13:50:37']
+stop_time  = ['2022-06-28 13:50:47']
+map_path = ['Assets\sanhok-map.jpg']
 
 sum_overpred_factor = 0
 count = 0
 
 for i, file in enumerate(recording_csv):
-    overpred_factor, loops = user_interface(recording_csv[i], prediction_csv[i], start_time[i], stop_time[i], map_path[i])
+    overpred_factor, loop_count = user_interface(recording_csv[i], prediction_csv[i], start_time[i], stop_time[i], map_path[i])
     sum_overpred_factor += overpred_factor
-    count += loops
+    count += loop_count
 
 print(sum_overpred_factor / count)
