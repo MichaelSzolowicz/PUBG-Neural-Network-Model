@@ -21,7 +21,7 @@ def string_to_datetime(timestamp):
     mill = int(timestamp[20:26])
 
     datetimestamp = datetime.time(hr, mins, sec, mill)
-    return datetime.datetime.combine(datetime.date(1, 1, 1), datetimestamp)
+    return datetime.datetime.combine(datetime.date(year, month, day), datetimestamp)
 
 
 def extract_coords(file_path, axis, range_min=None, range_max=None, start_time=None, stop_time=None):
@@ -166,22 +166,22 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
     # Later on, KDE functions will take x/y coords as separate lists.
     prd_x_extraction = extract_coords(prediction_csv, 'x', start_time=start_time, stop_time=stop_time)
     prd_y_extraction = extract_coords(prediction_csv, 'y', start_time=start_time, stop_time=stop_time)
-    for key in prd_y_extraction:        # Prep prediction data
-        pubg_norm.mirror_axis(prd_y_extraction[key])
+    for key in prd_y_extraction:
+        pubg_norm.mirror_axis(prd_y_extraction[key])    # Game uses top left origin, heatmap uses bottom left.
         prd_x_extraction[key] = [i * scale for i in prd_x_extraction[key]]
         prd_y_extraction[key] = [i * scale for i in prd_y_extraction[key]]
     rec_x_extraction = extract_coords(recording_csv, 'x', start_time=start_time, stop_time=stop_time)
     rec_y_extraction = extract_coords(recording_csv, 'y', start_time=start_time, stop_time=stop_time)
-    for key in rec_x_extraction:        # Prep recording data
-        rec_x_extraction[key] = pubg_norm.normalize(rec_x_extraction[key], 0, limit)
+    for key in rec_x_extraction:
+        rec_x_extraction[key] = pubg_norm.normalize(rec_x_extraction[key], 0, limit)    # Recordings aren't normalized
         rec_y_extraction[key] = pubg_norm.normalize(rec_y_extraction[key], 0, limit)
-        pubg_norm.mirror_axis(rec_y_extraction[key])
+        pubg_norm.mirror_axis(rec_y_extraction[key])        # Game uses top left origin, heatmap uses bottom left.
         rec_x_extraction[key] = [i * scale for i in rec_x_extraction[key]]
         rec_y_extraction[key] = [i * scale for i in rec_y_extraction[key]]
 
     # Variables used in loops
     sum_overpred_factor = 0
-    count = 0
+    loops = 0
     graph_rec = ''
     prev_graph_rec = ''
 
@@ -224,12 +224,12 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
         sum_neg, sum_pos = pubg_norm.sum_pos_neg(prd_z - rec_z)
         overpred_factor = pubg_norm.normalize([sum_pos], mini=0, maxi=fully_overpredicted)
         sum_overpred_factor += overpred_factor[0]
-        count += 1
+        loops += 1
 
         x_coords = [rec_x, prd_x]  # plot_heatmaps takes lists of coordinates to simplify function signature
         y_coords = [rec_y, prd_y]
         fig, ax = plot_heatmap((prd_z - rec_z), scale, map=map, prd_timestamp=graph_prd, rec_timestamp=graph_rec,
-                            overpred_factor=overpred_factor,  x=x_coords, y=y_coords, colors=['red', 'blue'])
+                               overpred_factor=overpred_factor,  x=x_coords, y=y_coords, colors=['red', 'blue'])
 
         file_timestamp = str(graph_prd).translate({ord(c): '_' for c in '- :.'})  # Reformat timestamp for filename
         match inp:
@@ -251,7 +251,7 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
                     plt.show()
                 pass
         plt.close()
-    return sum_overpred_factor, count
+    return sum_overpred_factor, loops
 
 
 recording_csv = ['PlayerPositions\player_pos_6_28_22_1337.csv']
@@ -261,11 +261,11 @@ stop_time  = ['2022-06-28 13:50:47']
 map_path = ['Assets\sanhok-map.jpg']
 
 sum_overpred_factor = 0
-count = 0
+total_loops = 0
 
 for i, file in enumerate(recording_csv):
-    overpred_factor, loop_count = user_interface(recording_csv[i], prediction_csv[i], start_time[i], stop_time[i], map_path[i])
+    overpred_factor, loops = user_interface(recording_csv[i], prediction_csv[i], start_time[i], stop_time[i], map_path[i])
     sum_overpred_factor += overpred_factor
-    count += loop_count
+    total_loops += loops
 
-print(sum_overpred_factor / count)
+print("Total Overprediction Factor: ", sum_overpred_factor / total_loops)
