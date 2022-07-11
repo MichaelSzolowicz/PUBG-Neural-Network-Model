@@ -2,75 +2,23 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ea213969-aea1-4349-ad1e-43fb95536799" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628134444.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628134445.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628134446.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628134447.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628134448.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628134449.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628134450.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628140422.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628140423.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628140424.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628140425.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628140426.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_20220628140427.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/pubg_normalization.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_2022_06_28_13_44_50_011451.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_2022_06_28_13_44_50_983741.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_2022_06_28_13_44_50_983741_07_00.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_2022_06_28_14_04_27_048054.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_2022_06_28_14_04_27_981125.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/Graphs/heatmap_2022_06_28_14_04_27_981125_07_00.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_6_29_22_1607.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_6_29_22_1626.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_6_23_1457.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_6_9_22_0923.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_6_9_22_1016.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_13_1704.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_13_1737.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_13_2230.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_13_2305.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_13_2343.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_14_0032.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_14_1616.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_14_1649.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_14_2037.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_14_2224.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_14_2256.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_15_0103.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_15_0132.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_16_0226.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_19_1303.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_19_1348.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_22_1100.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_22_1134.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_22_1210.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_22_1518.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_7_1415.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/NetworkPackets/packets_7_7_1449.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_6_23_1457.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_6_9_22_0923.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_6_9_22_1016.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_13_1704.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_13_1737.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_13_2230.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_13_2305.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_13_2343.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_14_0032.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_14_1616.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_14_1649.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_14_2037.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_14_2224.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_14_2256.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_15_0103.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_15_0132.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_16_0226.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_19_1303.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_19_1348.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_22_1100.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_22_1134.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_22_1210.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_22_1518.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_7_1415.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/PlayerPositions/player_pos_7_7_1449.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/match_playback.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/predictions.gif" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/pubg_heatmaps.py" beforeDir="false" afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/pubg_heatmaps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/tensor_timestamps.csv" beforeDir="false" afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/tensor_timestamps.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/train_x.pt" beforeDir="false" afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/train_x.pt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/train_y.pt" beforeDir="false" afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/train_y.pt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/trainmodel.py" beforeDir="false" afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/trainmodel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/val_x.pt" beforeDir="false" afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/val_x.pt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/REU Research/venv/REU Research/val_y.pt" beforeDir="false" afterPath="$PROJECT_DIR$/REU Research/venv/REU Research/val_y.pt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
