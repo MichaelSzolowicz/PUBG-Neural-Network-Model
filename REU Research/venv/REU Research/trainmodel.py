@@ -8,12 +8,12 @@ import os
 
 
 def train(m, x, y):
-	opt = torch.optim.Adam(m.parameters(), lr=0.01)
+	opt = torch.optim.Adam(m.parameters(), lr=0.01)		# lr = learning rate
 	loss_fn = torch.nn.MSELoss()
 	ls = []
 	y = y.nan_to_num()
-	y = y / y.max()
-	for i in range(100):	# Why is this loop here?
+	# y = y / y.max()
+	for i in range(100):
 		y_pred = m(x)
 		loss = loss_fn(y_pred, y)
 		opt.zero_grad()
@@ -25,7 +25,7 @@ def train(m, x, y):
 
 def evaluation(m, x, y):
 	y = y.nan_to_num()
-	y = y / y.max()
+	# y = y / y.max()
 	loss_fn = torch.nn.MSELoss()
 	return loss_fn(m(x), y)
 
@@ -34,7 +34,7 @@ def plot(m, val_x, val_y):
 	pred_val_y = m(val_x)
 	pred_rows = pred_val_y.tolist()
 	val_y = val_y.nan_to_num()
-	val_y = val_y / val_y.max()
+	# val_y = val_y / val_y.max()
 	actual_rows = val_y.tolist()
 
 	plt.style.use('seaborn')

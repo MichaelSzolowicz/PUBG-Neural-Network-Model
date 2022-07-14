@@ -9,7 +9,6 @@ timestamp = datetime.datetime
 
 # Port used in training: udp port 4380 or udp portrange 27000-27040
 # Full PUBG ports: tcp portrange 27015-27030 or tcp portrange 27037 or udp port 4380 or udp portrange 27000-
-
 # or udp port 27036
 
 # Port ranges that produce output as of June 2022. Note that output is erratic.
@@ -31,8 +30,7 @@ def main():
         packet = scapy.sniff(count=1, filter='udp portrange 7000-7999', iface='Ethernet')
         coordinates = get_predictions(m, packet)
         if coordinates is not None:
-            # I now have both the predicted coords and timestamp the packet was sent in place;
-            timestamp = get_timestamp(packet)
+            timestamp = get_timestamp(packet)   # I now have both the predicted coords and timestamp the packet was sent in one place
             print('TIMESTAMP', timestamp)
             print('COORD', coordinates)
             pubg_csv.record_prediction_csv('Predictions/predictions.csv', timestamp, coordinates)

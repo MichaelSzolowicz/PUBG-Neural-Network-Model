@@ -2,6 +2,7 @@ import csv
 import datetime
 import pytz
 import os
+import pubg_normalization
 
 
 # Creates or updates a record of predicted positions.
@@ -31,7 +32,7 @@ def record_prediction_csv(file_name, timestamp, predictions):
 
 
 # Creates a csv file of player positions given telemetry object
-def player_position_csv(telemetry, csv_file_name):
+def player_position_csv(telemetry, csv_file_name, map):
     csv_header = ['timestamp']
 
     """
@@ -77,15 +78,17 @@ def player_position_csv(telemetry, csv_file_name):
     csv_reader = csv.reader(open(csv_file_name))
     csv_list = list(csv_reader)
 
+    limit = pubg_normalization.map_limits(map)
+
     # Moves character positions from player_positions dictionary to csv_list in order to prepare for writing.
     for timestamp in timestamps_GMT:
         for players in player_positions:
             if players.timestamp == timestamp:
                 character_index = characters.index(players.character.name)
                 start_index = (character_index * 2) + (character_index + 1)
-                csv_list[timestamps_GMT.index(timestamp) + 1][start_index] = players.character.location.x
-                csv_list[timestamps_GMT.index(timestamp) + 1][start_index + 1] = players.character.location.y
-                csv_list[timestamps_GMT.index(timestamp) + 1][start_index + 2] = players.character.location.z
+                csv_list[timestamps_GMT.index(timestamp) + 1][start_index] = players.character.location.x / limit
+                csv_list[timestamps_GMT.index(timestamp) + 1][start_index + 1] = players.character.location.y / limit
+                csv_list[timestamps_GMT.index(timestamp) + 1][start_index + 2] = players.character.location.z / limit
 
     csv_writer = csv.writer(open(csv_file_name, 'w', newline=''))
     csv_writer.writerows(csv_list)

@@ -49,4 +49,4 @@ def map_limits(map_name):
         case 'karakin':
             return 204000
         case _:
-            return 800000
+            return 816000
