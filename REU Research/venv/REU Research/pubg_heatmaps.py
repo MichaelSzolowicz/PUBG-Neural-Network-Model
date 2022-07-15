@@ -11,16 +11,35 @@ fully_overpredicted = 4400
 graphs_path = 'Graphs/heatmap_{}.jpg'
 
 
+def sum_pos_neg(prediction_grid):
+    sum_neg = 0
+    sum_pos = 0
+    for i in prediction_grid:
+        for j in i:
+            if j < 0:
+                sum_neg += j
+            else:
+                sum_pos += j
+    return sum_neg, sum_pos
+
 def string_to_datetime(timestamp):
+    """
+    String to Datetime
+        Assumes string in format '1111-11-11 11:11:11.111111-1:11'
+    Args:
+        timestamp:
+    Return:
+         datetime:
+    """
     year = int(timestamp[:4])
     month = int(timestamp[5:7])
     day = int(timestamp[8:10])
     hr = int(timestamp[11:13])
     mins = int(timestamp[14:16])
     sec = int(timestamp[17:19])
-
     mill = 0
-    if timestamp[20:26] != '':
+
+    if timestamp[20:26] != '':      # If milliseconds exist in string, use milliseconds
         mill = int(timestamp[20:26])
 
     datetimestamp = datetime.time(hr, mins, sec, mill)
@@ -30,8 +49,7 @@ def string_to_datetime(timestamp):
 def extract_coords(file_path, axis, range_min=None, range_max=None, start_time=None, stop_time=None):
     """
     Extract Coords
-    Retrieve frames of coordinates along a given axis from a recording file.
-
+        Retrieve frames of coordinates along a given axis from a recording file.
     Args:
         file_path (str): location of file to extract from
         axis (str): Axis from which coordinates will be extracted
@@ -39,7 +57,6 @@ def extract_coords(file_path, axis, range_min=None, range_max=None, start_time=N
         range_max (int): Last index for slicing frames from. Indexing starts from 1 and includes header row.
         start_time (str): Start retrieving frames at this timestamp.
         stop_time (str): Stop retrieving frames at this timestamp. This timestamp is not included in returned dictionary.
-
     Returns:
         coords (dict): Dictionary where keys are timestamps and values are lists of coordinates.
     """
@@ -66,15 +83,17 @@ def extract_coords(file_path, axis, range_min=None, range_max=None, start_time=N
         start_time_digits = len(start_time)
         stop_time_digits = len(stop_time)
 
+        range_min = None
+
         for i, row in enumerate(temp_reader):
-            if row[0][:start_time_digits] == start_time:
+            if row[0][:start_time_digits] == start_time and range_min is not None:
                 range_min = i + 1
             if row[0][:stop_time_digits] == stop_time:
                 range_max = i + 1
                 break
 
     # Make dictionary with timestamps as keys and list of coordinates as values.
-    # Fill any missing coordinates with zero.
+    # Fill any missing coordinates with .00001.
     for count, row in enumerate(csv_reader):
         if range_min is None or range_max is None:
             coords[str(row[0])[:-6]] = []
@@ -96,20 +115,18 @@ def extract_coords(file_path, axis, range_min=None, range_max=None, start_time=N
 def perform_kde(coords_x, coords_y, bandwidth=.2, scale=1, res=100j):
     """
     Perform KDE
-
     Args:
         coords_x (list):
         coords_y (list):
         bandwidth: width of the kernel
         scale (int): Final size of x, y axes
-        res (complex): res^2 is equal to the number of points at which the KDE will be evaluated.
-        Higher number results in higher quality image at the cost of performance.
-
+        res (complex): Determines number of tiles over which the KDE will be evaluated.
+                       Higher number results in higher quality image at the cost of performance.
     Returns:
         kernel: Scipy KDE object
-        xx: X values at which KDE was tested.
-        yy: Y values at which KDE was tested.
-        z: Output (height) of KDE at tested points.
+        xx: Tiles X value at which KDE was tested.
+        yy: Tiles Y at which KDE was tested.
+        z: Output (height) of KDE at tested tiles.
     """
 
     xx, yy = np.mgrid[0:scale:res, 0:scale:res]
@@ -126,16 +143,14 @@ def perform_kde(coords_x, coords_y, bandwidth=.2, scale=1, res=100j):
 def plot_heatmap(z_values, scale=1, prd_timestamp=00, rec_timestamp=00, overpred_factor=None, map=None, x=None, y=None, colors=['black']):
     """
     Plot Heatmap
-
     Args:
-        z_values: Heatmap image.
-        scale (int): Axes size
+        z_values: Heatmap image grid.
+        scale: Axes size
         map: background image
         timestamp:
         x: List of x coordinates. Each list contained in list graphed with color of same index in colors.
         y: List of y coordinates. Each list contained in list graphed with x coordinates of corresponding index.
         colors: Graph list x[i] in color colors[i].
-
     Returns:
         fig:
         ax:
@@ -163,6 +178,25 @@ def plot_heatmap(z_values, scale=1, prd_timestamp=00, rec_timestamp=00, overpred
 
 
 def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_path, bandwidth=.2, scale=3, draw_fig=False):
+    """
+    User Interface
+        Performs necessary steps to generate heatmaps, using other functions from pubg_csv.
+        Extracts coordinates from recording and prediction files, matches recording and prediction
+        timestamps, graphs heatmap, and gives user option to save or discard maps.
+    Args:
+        recording_csv:
+        prediction_csv:
+        start_time:
+        stop_time:
+        map_path:
+        bandwidth: Width of the kernel used in KDE
+        scale: Size of the generated heatmap
+        draw_fig: Whether to show heatmap when generating
+
+    Returns:
+        sum_overpred_factor: The sum of each map's overprediction factor
+        loops: The number of heatmaps successfully generated
+    """
     map = mpimg.imread(map_path)
     limit = pubg_norm.map_limits(map_path[7:-8])
 
@@ -180,7 +214,7 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
         rec_x_extraction[key] = [i * scale for i in rec_x_extraction[key]]
         rec_y_extraction[key] = [i * scale for i in rec_y_extraction[key]]
 
-    # Variables used in loops
+    # Variables used for loop control
     sum_overpred_factor = 0
     loops = 0
     graph_rec = ''
@@ -202,11 +236,6 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
             if diff <= smallest_diff:
                 smallest_diff = diff
                 graph_rec = key
-
-                # print("Curr Key in prd", graph_prd)
-                # print("Curr key in rec", key)
-                # print("Diff", diff)
-                # print("Smallest Diff", smallest_diff)
             else:
                 break
 
@@ -224,7 +253,7 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
         prd_kernel, prd_xx, prd_yy, prd_z = perform_kde(prd_x, prd_y, .2, scale, 200j)
         rec_kernel, rec_xx, rec_yy, rec_z = perform_kde(rec_x, rec_y, .2, scale, 200j)
 
-        sum_neg, sum_pos = pubg_norm.sum_pos_neg(prd_z - rec_z)
+        sum_neg, sum_pos = sum_pos_neg(prd_z - rec_z)
         overpred_factor = pubg_norm.normalize([sum_pos], mini=0, maxi=fully_overpredicted)
         sum_overpred_factor += overpred_factor[0]
         loops += 1
@@ -235,24 +264,23 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
                                overpred_factor=overpred_factor,  x=x_coords, y=y_coords, colors=['red', 'blue'])
 
         file_timestamp = str(graph_prd).translate({ord(c): '_' for c in '- :.'})  # Reformat timestamp for filename
-        match inp:
-            case 'y':
-                plt.savefig(graphs_path.format(file_timestamp), dpi=200)
-                if draw_fig:
-                    plt.show()
-                inp = input('Save figure? y / n / YES_all / NO_all: ')
-            case 'YES_all':
-                plt.savefig(graphs_path.format(file_timestamp), dpi=200)
-                if draw_fig:
-                    plt.show()
-            case 'n':
-                if draw_fig:
-                    plt.show()
-                inp = input('Save figure? y / n / YES_all / NO_all: ')
-            case _:
-                if draw_fig:
-                    plt.show()
-                pass
+        if inp == 'y':
+            plt.savefig(graphs_path.format(file_timestamp), dpi=200)
+            if draw_fig:
+                plt.show()
+            inp = input('Save figure? y / n / YES_all / NO_all: ')
+        elif inp == 'YES_all':
+            plt.savefig(graphs_path.format(file_timestamp), dpi=200)
+            if draw_fig:
+                plt.show()
+        elif inp == 'n':
+            if draw_fig:
+                plt.show()
+            inp = input('Save figure? y / n / YES_all / NO_all: ')
+        else:
+            if draw_fig:
+                plt.show()
+            pass
         plt.close()
     return sum_overpred_factor, loops
 

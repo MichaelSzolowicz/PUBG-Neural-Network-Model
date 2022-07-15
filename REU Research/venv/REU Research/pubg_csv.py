@@ -5,30 +5,62 @@ import os
 import pubg_normalization
 
 
-# Creates or updates a record of predicted positions.
-def record_prediction_csv(file_name, timestamp, predictions):
-    # Create a csv file and fill with generic headers if csv file path does not yet exist.
+def generic_header(numplayers):
+    """
+    Generic Header
+        Returns a generic header list, first entry is 'timestamp'
+        followed by column headers for x, y, z coordinates for players 0 through (numplayers - 1)
+    Args:
+        numplayers:
+    Returns:
+        header:
+    """
     header = ['timestamp']
-    count = 0
-    if not os.path.exists(file_name):
-        while count < 100:
-            header.append('Player{0}_x'.format(count))
-            header.append('Player{0}_y'.format(count))
-            count += 1
-        write_file = open(file_name, 'w', newline='')
-        csv_writer = csv.DictWriter(write_file, fieldnames=header, restval="")
-        csv_writer.writeheader()
-        write_file.close()
-    # Else append a new timestamp and associated predictions to existing csv file.
-    else:
-        new_file = open(file_name, 'a', newline='')
+    for i in range(numplayers):
+        header.append('Player{0}_x'.format(i))
+        header.append('Player{0}_y'.format(i))
+        header.append('Player{0}_z'.format(i))
+    return header
+
+
+def fill_predictions_csv(csv_writer, predictions, timestamps):
+    """
+        Fill Predictions Csv
+        Fills a csv file, with each timestamp in timestamps corresponding to one row in predictions.
+    Args:
+        csv_writer:
+        predictions:
+        timestamps:
+    """
+    for i, row in enumerate(predictions):
+        write_row = [timestamps[i]]
+        for value in row:
+            write_row.append(value)
+        csv_writer.writerow(write_row)
+
+
+def append_predictions_csv(file_path, predictions, timestamps):
+    """
+    Append Predictions Csv
+        Checks if file_path exists, if not creates file with a generic header for 105 players.
+        Writes rows to file_path, with each timestamp in timestamps corresponding to a row in predictions.
+    Args:
+        file_path:
+        predictions:
+        timestamps:
+    """
+    if not os.path.exists(file_path):
+        new_file = open(file_path, 'a', newline='')
         csv_writer = csv.writer(new_file)
-        print('TIMESTAMP', timestamp)
-        timestamps = [timestamp.astimezone(pytz.timezone('US/Pacific'))]
-        for prediction in predictions:
-            timestamps.append(prediction[0])
-            timestamps.append(prediction[1])
-        csv_writer.writerow(timestamps)
+
+        header = generic_header(105)
+        csv_writer.writerow(header)
+        new_file.close()
+
+    new_file = open(file_path, 'a', newline='')
+    csv_writer = csv.writer(new_file)
+
+    fill_predictions_csv(csv_writer, predictions, timestamps)
 
 
 # Creates a csv file of player positions given telemetry object

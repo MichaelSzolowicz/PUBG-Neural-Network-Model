@@ -123,6 +123,14 @@ def menu():
 
 
 def place_coordinates(previous_coordinates):
+    """
+        I've changed packet_sniffer such that it stores coordinates in a raw list, rather than a list of tuples.
+        This keeps the format of realtime predictions similar to prediction made on recorded data,
+        streamlining csv generation.
+        To get the pygame app working again, this function will need to be updated to account for the change.
+    """
+    pass
+    """
     coordinates = packet_sniffer.coordinates
     if coordinates is not None:
         for coordinate in coordinates:
@@ -133,6 +141,7 @@ def place_coordinates(previous_coordinates):
             for coordinate in previous_coordinates:
                 WINDOW.blit(red_dot, (coordinate[0] * 1280, coordinate[1] * 720))
             return previous_coordinates
+    """
 
 
 def erangel():

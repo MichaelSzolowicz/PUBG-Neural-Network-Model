@@ -18,7 +18,6 @@ def get_bytes_list(network_traffic_file):
             packet_bytes = packet['_source']['layers']['data']['data.data']
             byte_data.append(packet_bytes)
         file.close()
-    print(timestamps)
     return byte_data, timestamps
 
 

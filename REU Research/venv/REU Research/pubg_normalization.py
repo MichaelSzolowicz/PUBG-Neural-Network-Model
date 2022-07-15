@@ -15,24 +15,11 @@ def mirror_axis(values):
         values[i] = abs(values[i] - 1)
 
 
-def sum_pos_neg(prediction_grid):
-    sum_neg = 0
-    sum_pos = 0
-    for i in prediction_grid:
-        for j in i:
-            if j < 0:
-                sum_neg += j
-            else:
-                sum_pos += j
-    return sum_neg, sum_pos
-
-
 def map_limits(map_name):
     """
     Map Limits
-    Each map has a unique upper limit for recorded coordinates. Note that not every map's bounds are listed
-    in the PUBG API documentation, in these cases a default value of 800000 is returned.
-
+        Each map has a unique upper limit for recorded coordinates. Note that not every map's bounds are listed
+        in the PUBG API documentation, in these cases a default value of 816000 is returned.
     Returns:
         (int): upper limit
     """

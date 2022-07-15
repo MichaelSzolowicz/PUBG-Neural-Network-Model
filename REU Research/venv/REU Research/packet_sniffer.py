@@ -3,6 +3,7 @@ import model, torch
 # from scapy.layers import http
 import datetime
 import pubg_csv
+import pytz
 
 coordinates = []
 timestamp = datetime.datetime
@@ -30,10 +31,10 @@ def main():
         packet = scapy.sniff(count=1, filter='udp portrange 7000-7999', iface='Ethernet')
         coordinates = get_predictions(m, packet)
         if coordinates is not None:
-            timestamp = get_timestamp(packet)   # I now have both the predicted coords and timestamp the packet was sent in one place
+            timestamp = get_timestamp(packet).astimezone(pytz.timezone('US/Pacific'))
             print('TIMESTAMP', timestamp)
             print('COORD', coordinates)
-            pubg_csv.record_prediction_csv('Predictions/predictions.csv', timestamp, coordinates)
+            pubg_csv.append_predictions_csv('Predictions/predictions.csv', [coordinates], [timestamp])
 
 
 
@@ -59,8 +60,11 @@ def get_predictions(m, packet):
             for i in range(0, len(prediction), 3):
                 x = prediction[i]
                 y = prediction[i + 1]
-                if x > 0.0001 and y > 0.0001:
-                    coordinates.append((x, y))
+                z = prediction[i + 2]
+                if x > 0.0001 and y > 0.0001 and z > 0.0001:
+                    coordinates.append(x)
+                    coordinates.append(y)
+                    coordinates.append(z)
             return coordinates
     else:
         print("You sent a packet!")
