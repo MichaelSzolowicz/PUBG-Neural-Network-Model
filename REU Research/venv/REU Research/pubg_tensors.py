@@ -13,12 +13,12 @@ def get_bytes_list(network_traffic_file):
         for packet in data:
             if int(packet['_source']['layers']['data']['data.len']) > 756 or int(packet['_source']['layers']['data']['data.len']) < 100:
                 continue
-            timestamp = packet['_source']['layers']['frame']['frame.time'][13:28]
+            timestamp = packet['_source']['layers']['frame']['frame.time_epoch']
             timestamps.append(timestamp)
             packet_bytes = packet['_source']['layers']['data']['data.data']
             byte_data.append(packet_bytes)
         file.close()
-
+    print(timestamps)
     return byte_data, timestamps
 
 
@@ -54,12 +54,15 @@ def get_tensors(player_pos_file, network_traffic_file):
     it = 0
     resize_packets = 0
     for timestamp in timestamps:
-        hr = int(timestamp[:2])
-        mins = int(timestamp[3:5])
-        sec = int(timestamp[6:8])
-        mill = int(timestamp[9:])
-        datetime_key = datetime.time(hr, mins, sec, mill)
-        datetime_key = datetime.datetime.combine(datetime.date(1, 1, 1), datetime_key)
+        datetime_key = datetime.datetime.fromtimestamp(float(timestamp))
+        datetime_key = datetime.datetime.combine(datetime.date(1, 1, 1), datetime_key.time())
+
+        #hr = int(timestamp[:2])
+        #mins = int(timestamp[3:5])
+        #sec = int(timestamp[6:8])
+        #mill = int(timestamp[9:])
+        #datetime_key = datetime.time(hr, mins, sec, mill)
+        #datetime_key = datetime.datetime.combine(datetime.date(1, 1, 1), datetime_key)
 
         for positions in player_pos[it:]:
             hr = int(positions[0][11:13])

@@ -7,6 +7,10 @@ import pubg_tensors
 import preparedata
 import csv
 import torch
+import datetime
+import pytz
+import model
+import torch
 
 
 def import_match_data(id_list, positions_csv_list, map):
@@ -31,24 +35,30 @@ def prepare_training_data(positions_csv_list, packets_list, training, map):
 
     for i in range(len(positions_csv_list)):
         # for pos, pack in zip()
-        x, y, timestamps = pubg_tensors.get_tensors(positions_csv_list[i].format(map), packets_list[i])
+        x, y, timestamps = pubg_tensors.get_tensors(positions_csv_list[i].format(map), packets_list[i].format(map))
 
+        # Write predictions to a csv if prepping for valuation
         if not training:
-            header = ['timestamp']
-            for i in range(105):
-                header.append('Player{0}_x'.format(i))
-                header.append('Player{0}_y'.format(i))
-                header.append('Player{0}_z'.format(i))
-            write_file = open('Pred.csv', 'w', newline='')
-            csv_writer = csv.DictWriter(write_file, fieldnames=header, restval="")
-            csv_writer.writeheader()
-            write_file.close()
+            m = model.load()
+            prd = m(x)
 
-            new_file = open('Pred.csv', 'a', newline='')
-            csv_writer = csv.writer(new_file)
-            list_y = y.tolist()
-            for row in list_y:
-                write_row = [ timestamps[0] ]
+            # Fill header with generic players
+            header = ['timestamp']
+            for j in range(105):
+                header.append('Player{0}_x'.format(j))
+                header.append('Player{0}_y'.format(j))
+                header.append('Player{0}_z'.format(j))
+
+            # Title the new predictions file with same time and maps as recording.
+            write_file = open('predictions_{}{}.csv'.format(positions_csv_list[i][-17:-6], map), 'w', newline='')
+            csv_writer = csv.writer(write_file)
+            csv_writer.writerow(header)
+
+            # Fill rows with timestamp, predictions
+            list_prd = prd.tolist()
+            for j, row in enumerate(list_prd):
+                datetimestamp = datetime.datetime.fromtimestamp(float(timestamps[j]))
+                write_row = [datetimestamp.astimezone(pytz.timezone('US/Pacific'))]
                 for value in row:
                     write_row.append(value)
                 csv_writer.writerow(write_row)
@@ -72,16 +82,16 @@ def prepare_training_data(positions_csv_list, packets_list, training, map):
 # Main function
 def main():
     id_list =               ['490b5eae-0667-452b-aade-32bc6ed54742']
-    player_positions_list = ['PlayerPositions/player_pos_62922_1607_{}.csv']
-    packets_list =          ['NetworkPackets/packets_6_29_22_1626.json']
-    map = 'erengal'
+    player_positions_list = ['PlayerPositions/player_pos_062922_1607_{}.csv']
+    packets_list =          ['NetworkPackets/packets_062922_1607_{}.json']
+    map = 'ergl'
 
-    #inp = input('Import match data? y / n: ')
-    #match inp:
-        #case 'y':
-            #import_match_data(id_list, player_positions_list, map)
-        #case _:
-            #pass
+    inp = input('Import match data? y / n: ')
+    match inp:
+        case 'y':
+            import_match_data(id_list, player_positions_list, map)
+        case _:
+            pass
 
     inp = input('Prepare data? training / valuation / none: ')
     match inp:

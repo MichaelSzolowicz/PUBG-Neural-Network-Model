@@ -18,7 +18,10 @@ def string_to_datetime(timestamp):
     hr = int(timestamp[11:13])
     mins = int(timestamp[14:16])
     sec = int(timestamp[17:19])
-    mill = int(timestamp[20:26])
+
+    mill = 0
+    if timestamp[20:26] != '':
+        mill = int(timestamp[20:26])
 
     datetimestamp = datetime.time(hr, mins, sec, mill)
     return datetime.datetime.combine(datetime.date(year, month, day), datetimestamp)
@@ -159,7 +162,7 @@ def plot_heatmap(z_values, scale=1, prd_timestamp=00, rec_timestamp=00, overpred
     return fig, ax
 
 
-def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_path, bandwidth=.2, scale=3, draw_fig=True):
+def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_path, bandwidth=.2, scale=3, draw_fig=False):
     map = mpimg.imread(map_path)
     limit = pubg_norm.map_limits(map_path[7:-8])
 
@@ -173,8 +176,6 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
     rec_x_extraction = extract_coords(recording_csv, 'x', start_time=start_time, stop_time=stop_time)
     rec_y_extraction = extract_coords(recording_csv, 'y', start_time=start_time, stop_time=stop_time)
     for key in rec_x_extraction:
-        rec_x_extraction[key] = pubg_norm.normalize(rec_x_extraction[key], 0, limit)    # Recordings aren't normalized
-        rec_y_extraction[key] = pubg_norm.normalize(rec_y_extraction[key], 0, limit)
         pubg_norm.mirror_axis(rec_y_extraction[key])        # Game uses top left origin, heatmap uses bottom left.
         rec_x_extraction[key] = [i * scale for i in rec_x_extraction[key]]
         rec_y_extraction[key] = [i * scale for i in rec_y_extraction[key]]
@@ -193,6 +194,8 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
 
         # For every key in predictions, find the closest key in recording
         for key in rec_x_extraction:
+            print('Recording: ', key)
+            print('Prediction: ', graph_prd)
             diff = string_to_datetime(key) - string_to_datetime(graph_prd)
             diff = abs(diff.total_seconds())
 
@@ -254,11 +257,11 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
     return sum_overpred_factor, loops
 
 
-recording_csv = ['PlayerPositions\player_pos_6_28_22_1337.csv']
-prediction_csv = ['Predictions\predictions_6_28_22_1337.csv']
-start_time = ['2022-06-28 13:50:37']
-stop_time  = ['2022-06-28 13:50:47']
-map_path = ['Assets\sanhok-map.jpg']
+recording_csv = ['PlayerPositions/player_pos_062922_1607_ergl.csv']
+prediction_csv = ['Predictions/predictions_062922_1607_ergl.csv']
+start_time = [None]
+stop_time  = [None]
+map_path = ['Assets/erangel-map.jpg']
 
 sum_overpred_factor = 0
 total_loops = 0

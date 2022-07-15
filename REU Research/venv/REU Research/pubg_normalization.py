@@ -38,15 +38,15 @@ def map_limits(map_name):
     """
 
     match map_name:
-        case 'erangel':
+        case 'erangel', 'ergl':
             return 816000
-        case 'miramar':
+        case 'miramar', 'mrmr':
             return 816000
-        case 'vikendi':
+        case 'vikendi', 'vknd':
             return 612000
-        case 'sanhok':
+        case 'sanhok', 'snhk':
             return 408000
-        case 'karakin':
+        case 'karakin', 'krkn':
             return 204000
         case _:
             return 816000
