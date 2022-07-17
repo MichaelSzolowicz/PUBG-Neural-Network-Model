@@ -80,7 +80,7 @@ def prepare_valuation_data(positions_csv, packets, map):
     prd = m(x)
     list_prd = prd.tolist()
 
-    write_file = open('predictions_{}{}.csv'.format(positions_csv[-17:-6], map), 'w', newline='')   # New file
+    write_file = open('predictions_{}{}.csv'.format(positions_csv[-18:-6], map), 'w', newline='')   # New file
     csv_writer = csv.writer(write_file)
 
     header = pubg_csv.generic_header(105)
@@ -93,9 +93,9 @@ def prepare_valuation_data(positions_csv, packets, map):
 
 # Main function
 def main():
-    id_list =               ['fcd45c85-07e1-448b-9136-1d58040d6542']
-    player_positions_list = ['PlayerPositions/player_pos_071222_1622_{}.csv']
-    packets_list =          ['NetworkPackets/packets_071222_1622_{}.json']
+    id_list =               ['b8419a2f-e824-4d1a-9296-8132c8aa7ba0', '70b2d647-eaf0-492e-a5cc-d6e66192e733', '5295efa3-8032-4071-b0aa-c4c0e5133988', '7d96d03f-7121-477f-b962-54c127509561']
+    player_positions_list = ['PlayerPositions/player_pos_071322_1454_{}.csv', 'PlayerPositions/player_pos_071222_1608_{}.csv', 'PlayerPositions/player_pos_071122_1536_{}.csv', 'PlayerPositions/player_pos_071122_1359_{}.csv']
+    packets_list =          ['NetworkPackets/packets_071322_1454_{}.json', 'NetworkPackets/packets_071222_1608_{}.json', 'NetworkPackets/packets_071122_1536_{}.json', 'NetworkPackets/packets_071122_1359_{}.json']
     map = 'mrmr'
 
     inp = input('Import match data? y / n: ')
