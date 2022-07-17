@@ -228,8 +228,6 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
 
         # For every key in predictions, find the closest key in recording
         for key in rec_x_extraction:
-            print('Recording: ', key)
-            print('Prediction: ', graph_prd)
             diff = string_to_datetime(key) - string_to_datetime(graph_prd)
             diff = abs(diff.total_seconds())
 
@@ -239,10 +237,12 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
             else:
                 break
 
-        # Prevents comparison of multiple predictions against same recording,
-        # can be removed if user desires to graph every prediction.
+        # Prevents comparison of multiple predictions against same recording.
         if graph_rec == prev_graph_rec:
             continue
+        elif prev_graph_rec != '':
+            del rec_x_extraction[prev_graph_rec]
+            del rec_y_extraction[prev_graph_rec]
         prev_graph_rec = graph_rec
 
         rec_x = rec_x_extraction[graph_rec]     # KDE Functions take x/y coords as separate lists.
@@ -262,6 +262,7 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
         y_coords = [rec_y, prd_y]
         fig, ax = plot_heatmap((prd_z - rec_z), scale, map=map, prd_timestamp=graph_prd, rec_timestamp=graph_rec,
                                overpred_factor=overpred_factor,  x=x_coords, y=y_coords, colors=['red', 'blue'])
+        print('Plotted prd:', graph_prd)
 
         file_timestamp = str(graph_prd).translate({ord(c): '_' for c in '- :.'})  # Reformat timestamp for filename
         if inp == 'y':
@@ -285,11 +286,11 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
     return sum_overpred_factor, loops
 
 
-recording_csv = ['PlayerPositions/player_pos_062922_1607_ergl.csv']
-prediction_csv = ['Predictions/predictions_062922_1607_ergl.csv']
+recording_csv = ['PlayerPositions/player_pos_071222_1622_mrmr.csv']
+prediction_csv = ['Predictions/predictions_071222_1622_mrmr.csv']
 start_time = [None]
 stop_time  = [None]
-map_path = ['Assets/erangel-map.jpg']
+map_path = ['Assets/miramar-map.jpg']
 
 sum_overpred_factor = 0
 total_loops = 0

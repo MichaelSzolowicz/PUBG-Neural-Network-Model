@@ -93,9 +93,9 @@ def prepare_valuation_data(positions_csv, packets, map):
 
 # Main function
 def main():
-    id_list =               ['b8419a2f-e824-4d1a-9296-8132c8aa7ba0', 'fcd45c85-07e1-448b-9136-1d58040d6542', '70b2d647-eaf0-492e-a5cc-d6e66192e733']
-    player_positions_list = ['PlayerPositions/player_pos_071322_1454_{}.csv', 'PlayerPositions/player_pos_071222_1622_{}.csv', 'PlayerPositions/player_pos_071222_1608_{}.csv']
-    packets_list =          ['NetworkPackets/packets_071322_1454_{}.json', 'NetworkPackets/packets_071222_1622_{}.json', 'NetworkPackets/packets_071222_1608_{}.json']
+    id_list =               ['fcd45c85-07e1-448b-9136-1d58040d6542']
+    player_positions_list = ['PlayerPositions/player_pos_071222_1622_{}.csv']
+    packets_list =          ['NetworkPackets/packets_071222_1622_{}.json']
     map = 'mrmr'
 
     inp = input('Import match data? y / n: ')
