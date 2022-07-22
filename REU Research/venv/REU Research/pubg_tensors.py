@@ -35,30 +35,6 @@ def get_players_pos_list(player_pos_file):
     df_list = df.values.tolist()
     return df_list, local_player_index
 
-def n_closest(origin, list):
-    coord_list = []
-    for i in range(1, 316, 3):
-        if i != origin:
-            if i >= len(list):
-                coord_list.append((0.0, 0.0, 0.0))
-            else:
-                coord_list.append((list[i], list[i + 1], list[i + 2]))
-        else:
-            origin = (list[i], list[i + 1], list[i + 2])
-
-    distances = {}
-    for coord in coord_list:
-        distances[(math.sqrt((coord[0] - origin[0])**2 + (coord[1] - origin[1])**2))] = coord
-    keys = sorted(distances, reverse=False)
-
-    return_coords = []
-    for i in range(20):
-        return_coords.append(distances[keys[i]][0])
-        return_coords.append(distances[keys[i]][1])
-        return_coords.append(distances[keys[i]][2])
-    # print(return_coords)
-    return return_coords
-
 
 # Takes in two files, one json from wireshark and another csv from player positions and returns the data in tensors
 def get_tensors(player_pos_file, network_traffic_file):
@@ -108,11 +84,6 @@ def get_tensors(player_pos_file, network_traffic_file):
             time_diff = datetime_key - datetime_player
             player_pos_row = []
             if datetime_thresh_min <= time_diff <= datetime_thresh_max:
-                closest_pos = n_closest(local_player_index, player_pos[it])
-                # print(closest_pos)
-                player_pos_row.extend(closest_pos)
-
-                """
                 for i in range(1, 316, 3):
                     if i >= len(player_pos[0]):
                         player_pos_row.append(float(0.0))
@@ -126,7 +97,6 @@ def get_tensors(player_pos_file, network_traffic_file):
                         player_pos_row.append(float(player_pos[it][i]))
                         player_pos_row.append(float(player_pos[it][i + 1]))
                         player_pos_row.append(float(player_pos[it][i + 2]))
-                """
                 break
             elif time_diff < datetime_thresh_max:
                 break
