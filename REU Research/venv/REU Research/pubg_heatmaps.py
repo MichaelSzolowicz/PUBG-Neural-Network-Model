@@ -86,7 +86,7 @@ def extract_coords(file_path, axis, range_min=None, range_max=None, start_time=N
         range_min = None
 
         for i, row in enumerate(temp_reader):
-            if row[0][:start_time_digits] == start_time and range_min is not None:
+            if row[0][:start_time_digits] == start_time:
                 range_min = i + 1
             if row[0][:stop_time_digits] == stop_time:
                 range_max = i + 1
@@ -239,7 +239,7 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
 
         # Prevents comparison of multiple predictions against same recording.
         if graph_rec == prev_graph_rec:
-            continue
+            pass
         elif prev_graph_rec != '':
             del rec_x_extraction[prev_graph_rec]
             del rec_y_extraction[prev_graph_rec]
@@ -286,10 +286,10 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
     return sum_overpred_factor, loops
 
 
-recording_csv = ['PlayerPositions/player_pos_071222_1622_mrmr.csv']
-prediction_csv = ['Predictions/predictions_071222_1622_mrmr.csv']
-start_time = [None]
-stop_time  = [None]
+recording_csv = ['PlayerPositions/player_pos_071122_1359_mrmr.csv']
+prediction_csv = ['Predictions/predictions_071122_1359_mrmr.csv']
+start_time = ['2022-07-11 14:01']
+stop_time  = ['2022-07-11 14:05']
 map_path = ['Assets/miramar-map.jpg']
 
 sum_overpred_factor = 0

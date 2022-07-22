@@ -6,8 +6,8 @@ import os
 class NN(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Linear(756, 500)
-        self.fc2 = nn.Linear(500, 315)
+        self.fc1 = nn.Linear(756, 250)
+        self.fc2 = nn.Linear(250, 315)
 
     def forward(self, x):
         x = torch.sigmoid(self.fc1(x))

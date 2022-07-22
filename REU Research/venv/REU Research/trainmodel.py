@@ -12,15 +12,34 @@ def train(m, x, y):
 	loss_fn = torch.nn.MSELoss()
 	ls = []
 	y = y.nan_to_num()
-	# y = y / y.max()
+
+	BATCHES = 1
+	start = 0
+	split = 0
+
 	for i in range(100):
-		y_pred = m(x)
-		loss = loss_fn(y_pred, y)
-		opt.zero_grad()
-		loss.backward()
-		opt.step()
-		print(loss)
-		ls.append(loss)
+		for batch in range(BATCHES):
+			x_size = x.size()[0]
+			split += math.floor(x_size/BATCHES)
+
+			# print(start)
+			# print(split)
+
+			_x = x[start:split]
+			_y = y[start:split]
+
+			start = split
+
+			y_pred = m(_x)
+			loss = loss_fn(y_pred, _y)
+			opt.zero_grad()
+			loss.backward()
+			opt.step()
+			print(loss)
+			ls.append(loss)
+
+		start = 0
+		split = 0
 
 
 def evaluation(m, x, y):
@@ -111,9 +130,9 @@ def plot(m, val_x, val_y):
 def main():
 	m = model.load()
 
-	# train_x = torch.load('train_x.pt')
-	# train_y = torch.load('train_y.pt')
-	# train(m, train_x, train_y)
+	train_x = torch.load('train_x.pt')
+	train_y = torch.load('train_y.pt')
+	train(m, train_x, train_y)
 
 	val_x = torch.load('val_x.pt')
 	val_y = torch.load('val_y.pt')
@@ -123,13 +142,13 @@ def main():
 
 	# plot(m, val_x, val_y)
 
-	# val = input('Save Model? (Y/N): ')
-	# val = val.upper()
-	# if val == 'Y':
-		# model.save(m)
-		# print('Model saved!')
-	# else:
-		# print('Model not saved.')
+	val = input('Save Model? (Y/N): ')
+	val = val.upper()
+	if val == 'Y':
+		model.save(m)
+		print('Model saved!')
+	else:
+		print('Model not saved.')
 
 
 if __name__ == "__main__":
