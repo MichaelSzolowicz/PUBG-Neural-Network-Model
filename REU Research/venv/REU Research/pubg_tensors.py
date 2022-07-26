@@ -14,8 +14,6 @@ def get_bytes_list(network_traffic_file):
         for packet in data:
             if int(packet['_source']['layers']['data']['data.len']) > 756 or int(packet['_source']['layers']['data']['data.len']) < 100:
                 continue
-            if packet['_source']['layers']['data']['data.data'][:2] != '7a':
-               continue
             timestamp = packet['_source']['layers']['frame']['frame.time_epoch']
             timestamps.append(timestamp)
             packet_bytes = packet['_source']['layers']['data']['data.data']
@@ -27,13 +25,9 @@ def get_bytes_list(network_traffic_file):
 # Reads in the csv file for player positions and returns a list while dropping the header row
 def get_players_pos_list(player_pos_file):
     df = pd.read_csv(player_pos_file)
-    local_player_index = 0
-    for count, player in enumerate(df):
-        if player == 'Mszolo_x':
-            local_player_index = count
     df = df.drop([0], axis=0)
     df_list = df.values.tolist()
-    return df_list, local_player_index
+    return df_list
 
 
 # Takes in two files, one json from wireshark and another csv from player positions and returns the data in tensors
@@ -53,7 +47,7 @@ def get_tensors(player_pos_file, network_traffic_file):
                 byte_row.append(float(0.0))
         final_byte_data.append(byte_row)
 
-    player_pos, local_player_index = get_players_pos_list(player_pos_file)
+    player_pos = get_players_pos_list(player_pos_file)
     final_player_pos = []
     datetime_thresh_max = datetime.timedelta(milliseconds=1000)
     datetime_thresh_min = datetime.timedelta(milliseconds=0)

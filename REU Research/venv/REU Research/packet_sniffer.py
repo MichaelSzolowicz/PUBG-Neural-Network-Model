@@ -28,7 +28,7 @@ def main():
     print('Packet Sniffer Sniffs')
     m = model.load()
     while True:
-        packet = scapy.sniff(count=1, filter='udp portrange 7000-7999', iface='Ethernet')
+        packet = scapy.sniff(count=1, filter="udp portrange 7000-7999", iface='Ethernet')
         coordinates = get_predictions(m, packet)
         if coordinates is not None:
             timestamp = get_timestamp(packet).astimezone(pytz.timezone('US/Pacific'))

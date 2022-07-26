@@ -13,7 +13,7 @@ def train(m, x, y):
 	ls = []
 	y = y.nan_to_num()
 
-	BATCHES = 1
+	BATCHES = 3
 	start = 0
 	split = 0
 

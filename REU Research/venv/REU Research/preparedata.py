@@ -12,6 +12,8 @@ def prepare_data_training(x, y, timestamps):
     val_y = y[idx[split:], :]
     timestamps = timestamps[split:]
 
+    print(train_x.size())
+
     torch.save(train_x, 'train_x.pt')
     torch.save(train_y, 'train_y.pt')
     # torch.save(val_x, 'val_x.pt')

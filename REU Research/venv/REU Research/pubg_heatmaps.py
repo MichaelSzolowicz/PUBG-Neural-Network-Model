@@ -147,7 +147,8 @@ def plot_heatmap(z_values, scale=1, prd_timestamp=00, rec_timestamp=00, overpred
         z_values: Heatmap image grid.
         scale: Axes size
         map: background image
-        timestamp:
+        prd_timestamp:
+        rec_timestamp:
         x: List of x coordinates. Each list contained in list graphed with color of same index in colors.
         y: List of y coordinates. Each list contained in list graphed with x coordinates of corresponding index.
         colors: Graph list x[i] in color colors[i].
@@ -239,7 +240,8 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
 
         # Prevents comparison of multiple predictions against same recording.
         if graph_rec == prev_graph_rec:
-            pass
+            pass    # Use 'continue' to prevent graphing prds which correspond to rec timestamps already graphed.
+                    # Use 'passs' to graph every prd.
         elif prev_graph_rec != '':
             del rec_x_extraction[prev_graph_rec]
             del rec_y_extraction[prev_graph_rec]
@@ -286,17 +288,17 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
     return sum_overpred_factor, loops
 
 
-recording_csv = ['PlayerPositions/player_pos_071122_1359_mrmr.csv']
-prediction_csv = ['Predictions/predictions_071122_1359_mrmr.csv']
-start_time = ['2022-07-11 14:01']
-stop_time  = ['2022-07-11 14:05']
-map_path = ['Assets/miramar-map.jpg']
+recording_csv = ['PlayerPositions/player_pos_7_22_1134.csv']
+prediction_csv = ['Predictions/predictions_7_22_1134.csv']
+start_time = [None]
+stop_time  = [None]
+map_path = ['Assets/erangel-map.jpg']
 
 sum_overpred_factor = 0
 total_loops = 0
 
 for i, file in enumerate(recording_csv):
-    overpred_factor, loops = user_interface(recording_csv[i], prediction_csv[i], start_time[i], stop_time[i], map_path[i])
+    overpred_factor, loops = user_interface(recording_csv[i], prediction_csv[i], start_time[i], stop_time[i], map_path[0])
     sum_overpred_factor += overpred_factor
     total_loops += loops
 
