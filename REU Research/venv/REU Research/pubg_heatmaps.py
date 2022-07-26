@@ -287,19 +287,26 @@ def user_interface(recording_csv, prediction_csv, start_time, stop_time, map_pat
         plt.close()
     return sum_overpred_factor, loops
 
+def main():
+    recording_csv = ['PlayerPositions/player_pos_7_22_1134.csv']
+    prediction_csv = ['Predictions/predictions_7_22_1134.csv']
 
-recording_csv = ['PlayerPositions/player_pos_7_22_1134.csv']
-prediction_csv = ['Predictions/predictions_7_22_1134.csv']
-start_time = [None]
-stop_time  = [None]
-map_path = ['Assets/erangel-map.jpg']
+    # start_time and stop_time can be entered to any level of specificity. extract_coords will truncate the file
+    # timestamps to the length of the current string either start_time or stop_time (depending on which it is looking for).
+    # Then it will start extracting at the last instance of start_time and first instance of stop_time.
+    start_time = [None]
+    stop_time  = [None]
+    map_path = ['Assets/erangel-map.jpg']
 
-sum_overpred_factor = 0
-total_loops = 0
+    sum_overpred_factor = 0
+    total_loops = 0
 
-for i, file in enumerate(recording_csv):
-    overpred_factor, loops = user_interface(recording_csv[i], prediction_csv[i], start_time[i], stop_time[i], map_path[0])
-    sum_overpred_factor += overpred_factor
-    total_loops += loops
+    for i, file in enumerate(recording_csv):
+        overpred_factor, loops = user_interface(recording_csv[i], prediction_csv[i], start_time[i], stop_time[i], map_path[0])
+        sum_overpred_factor += overpred_factor
+        total_loops += loops
 
-print("Total Overprediction Factor: ", sum_overpred_factor / total_loops)
+    print("Total Overprediction Factor: ", sum_overpred_factor / total_loops)
+
+if __name__ == "__main__":
+    main()

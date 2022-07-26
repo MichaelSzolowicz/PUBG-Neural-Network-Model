@@ -1,12 +1,14 @@
 # Neural Network Model to Predict Player Positions in PUBG
-This is a research project that was originally conducted with the REU program in Cal Poly Pomona. The goal of this project is to train a neural network model to predict player positions using network packets.
+This is a research project that was originally conducted with the REU in Big Data and Cybersecurity in Cal Poly Pomona. The goal of this project is to train a neural network model to predict player positions using network packets.
 
-This project has a few different components to it:
+The current high level workflow looks like this:
 
- - Parse replay files using the chicken-dinner library
- - Create tensors for player positions and network packets to train neural network model
- - Use tensors to train neural network model
- - PyGame that is currently under development to predict player positions in real-time.
+- To train the model, collect network packets using wireshark and export jsons from the records.
+- Use [main.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/main.py) to retrieve match recordings and create tensors from the packets.
+- Use [trainmodel.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/trainmodel.py) to train the model.
+- [pubg_heatmaps.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/pubg_heatmaps.py) is designed to help validate the results with more detail.
+- PyGame ( [pubg_pygame_app.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/pubg_pygame_app.py)) and Scapy ([packet_sniffer.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/packet_sniffer.py))
+  are used to display predictions during a match in real time.
 
 This project uses the Chicken Dinner library from Python and is written entirely in Python.
 Information on the chicken-dinner library can be found here:  [ReadTheDocs.io](https://chicken-dinner.readthedocs.io/en/latest/#) & [Github Source Code](https://github.com/crflynn/chicken-dinner/blob/master/docs/index.rst)
@@ -16,7 +18,7 @@ All important scripts are found in the REU_Project/REU Research/venv/[REU Resear
 - [main.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/main.py) is where the player position and network packets are turned into tensors to be used in training/evaluating the model (may need your own API key to run some code)
 - [model.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/model.py) is the neural network model
 - [packet_sniffer.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/packet_sniffer.py) is used in the PyGame tool to continuously sniff packets
-- [preparedata.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/preparedata.py) is what is used to create tensors to train/evaluate model
+- [preparedata.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/preparedata.py) creates random permutations from tensors and saves them for later training.
 - [pubg_csv.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/pubg_csv.py) is what is used to create CSV files for player positions
 - [pubg_heatmaps.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/pubg_heatmaps.py) Generate heatmaps comparing actual game coordinates to records of predicted coordinates.
 - [pubg_info.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/pubg_info.py) is only used for getting information from chicken-dinner library
@@ -26,23 +28,42 @@ All important scripts are found in the REU_Project/REU Research/venv/[REU Resear
 - [pubg_tensors.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/pubg_tensors.py) is used to create tensors from player position CSV files and JSON network packet files from WireShark
 - [trainmodel.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/trainmodel.py)  is used to train, evaluate, and plot the model
 
+## Collecting Data
+Data can be collected using wireshark. After recording net traffic during a match, you can save the wireshark
+file then use File->Export Packet Dissections to save the packets as a json file.
+
 ## Parsing Replay Files
-Replay files can be extracted in main.py. Enter the match IDs and paths where you would like to save the replays at the top of main(), then enter 'y' when the program prompts you import match data.
+Replay files can be extracted in [main.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/main.py). Go to the top of main(), Enter the match IDs, 
+paths where you would like to save the  replays, and maps the matches were played on, 
+then enter 'y' when the program prompts you import match data.
 
-Player positions are saved into a CSV file which are then used to create tensors to train/evaluate the model
+Player positions are saved into a CSV file which are then used to create tensors to train/evaluate the model.
 
-## Network Packet Collection
-Network packets used to train the model were captured using [WireShark](https://www.wireshark.org/).
- - Record network packets during the game, then use export packet dissections to save them in .json format.
- - [pubg_tensors.py](https://github.com/Jorge626/REU_Project/blob/main/REU%20Research/venv/REU%20Research/pubg_tensors.py) is then used in [main.py](https://github.com/Jorge626/REU_Project/blob/main/REU%20Research/venv/REU%20Research/main.py) to convert them into tensors used for training.
- 
- The scapy library is used to sniff packets in real time, which allows the PyGame app to draw predictions to a map in real time.
- - [packet_sniffer.py](https://github.com/Jorge626/REU_Project/blob/main/REU%20Research/venv/REU%20Research/packet_sniffer.py) Implements the packet sniffing using scapy. 
- 
+The map name is important because it is used to normalize the recorded coordinates. The program uses 4 letter
+abbreviations of each full name, which are as follows:
+- 'Miramar' -> 'mrmr'
+- 'Erangel' -> 'ergl'
+- 'Vikendi' -> 'vknd'
+- 'Sanhok'  -> 'snhk'
+- 'Karakin' -> 'krkn'
+
 ## Training Model
-Once tensors have been created using the [main.py](https://github.com/Jorge626/REU_Project/blob/main/REU%20Research/venv/REU%20Research/main.py) file, the tensors can be used to either train or evaluate the model in [trainmodel.py](https://github.com/Jorge626/REU_Project/blob/main/REU%20Research/venv/REU%20Research/trainmodel.py)
- - The model can be saved if the evaluations are favorable
- - A plot is also created to visualize the predictions compared to the actual player positions
+[main.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/main.py) is also used to create tensors for traning the model. Enter the player position csv files and corresponding 
+network json files at the top of main(). Additionally enter the map the matches were played on. 
+
+After running [main.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/main.py), you will be prompted to either prepare training or valuation data, or none at all.
+
+- Note that when you prepare valuation data, the program will also produce a csv of predicted locations using
+the current model. This can be used after training the model to generate prediction files for heatmap evaluation.
+- Note that the map name you enter will be used to construct the name of any generated csv file when evaluating.
  
+## Heatmap Validation
+[pubg_heatmaps.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/pubg_heatmaps.py) works similar to [main.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/main.py). You enter the recording csv and corresponding prediction csv you would
+like to graph at the top of main(). Additionally, start_time and stop_time can be used to list the first and last
+timestamps you would like to graph from each recording & prediction file. map_path lists the maps you would
+like to draw the resulting heatmaps over.
+
 ## PyGame
-A simple PyGame application is currently under development in [pubg_pygame_app.py](https://github.com/Jorge626/REU_Project/blob/main/REU%20Research/venv/REU%20Research/pubg_pygame_app.py). Currently, the user can simply choose which map is being played and then that map is displayed as well as the predicted player positions as soon as a network packet is received.
+The PyGame app makes real time predictions based on packets collected by Scapy. 
+- [packet_sniffer.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/packet_sniffer.py) collects the packets.
+- [pubg_plots.py](https://github.com/MichaelSzolowicz/PUBG-Neural-Network-Model/blob/main/REU%20Research/venv/REU%20Research/pubg_plots.py) takes the packets and draws the model's predictions over an image of the game map.

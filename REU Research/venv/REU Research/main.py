@@ -98,12 +98,12 @@ def main():
     id_list =               []
     player_positions_list = ['PlayerPositions/player_pos_071122_1536_{}.csv']
     packets_list =          ['NetworkPackets/packets_071122_1536_{}.json']
-    map = 'mrmr'
+    maps = ['mrmr']
 
     inp = input('Import match data? y / n: ')
     if inp == 'y':
         for i, id in enumerate(id_list):
-            import_match_data(id, player_positions_list[i], map)
+            import_match_data(id, player_positions_list[i], maps[0])
     else:
         pass
 
@@ -114,7 +114,7 @@ def main():
     inp = input('Prepare data? training / valuation / none: ')
     if inp == 'training':
         for i, file in enumerate(player_positions_list):
-            x, y, timestamps = prepare_training_data(file, packets_list[i], map)
+            x, y, timestamps = prepare_training_data(file, packets_list[i], maps[0])
 
             tensor_x = torch.cat((tensor_x, x))
             tensor_y = torch.cat((tensor_y, y))
@@ -131,7 +131,7 @@ def main():
             csv_writer.writerow([datetimestamp.astimezone(pytz.timezone('US/Pacific'))])
     elif inp == 'valuation':
         for i, file in enumerate(player_positions_list):
-            x, y, timestamps = prepare_valuation_data(file, packets_list[i], map)
+            x, y, timestamps = prepare_valuation_data(file, packets_list[i], maps[0])
 
             tensor_x = torch.cat((tensor_x, x))
             tensor_y = torch.cat((tensor_y, y))
